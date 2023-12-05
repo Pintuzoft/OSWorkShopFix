@@ -66,8 +66,9 @@ sub parse_line {
         return;
     }
 
-    # Process "Game Over" line
-    if ($line =~ /Game Over/ && !$game_over_processed) {
+    # Process "Game Over" event line
+    # if ($line =~ /Game Over/ && !$game_over_processed) {
+    if ($line =~ /^L \d{2}\/\d{2}\/\d{4} - \d{2}:\d{2}:\d{2}: Game Over:/ && !$game_over_processed) {
         $game_over_processed = 1;
         my $nextmap = $maps[rand @maps];
 

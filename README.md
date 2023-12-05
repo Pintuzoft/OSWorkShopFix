@@ -5,6 +5,9 @@ Simple perl script to automate WorkShop Maps for CS2 servers.
 This is a server script that parses the console log to identify when a match has ended
 and then it will pick a new map at random and change to it.
 
+Please note that Im still testing this script out and have been sorting some bugs, so it
+might not be working 100% but 
+
 
 ## ===[ Install ]=========
 
