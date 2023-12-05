@@ -47,3 +47,24 @@ https://linuxgsm.com/servers/cs2server/
   
   "* * * * * /home/cs2/OSWorkShopFix-main/workshopfix.sh >>/home/cs2/OSWorkShopFix-main/workshopfix.log 2>&1"
   
+
+## ===[ Information ]=========
+
+  this script was made to automate the use of workshop maps on a CS2 server. Basically
+  in CSGO we could do this by setting some launch options, and it would play through
+  the list of maps it had in a collection automatically. In CS2 this however has not 
+  yet been enabled the same way, so as far as I know while writting this readme file
+  a CS2 server can only run 1 workshop map at a time by default, even if you add a 
+  collection you cant make it automatically choose another map without interfering
+  with the server.
+
+  So thats where this script comes in, it allows for the server to automatically choose
+  a random map in the loaded map collection and change to it after the match ended.
+
+  In the future its expected that valve enables the use of workshop map collections
+  to work the same way it did in CSGO, but until then we just have to be creative and
+  solve it ourselfs.
+
+  I hope this script comes in handy for anyone who needs it
+
+  ./Pintuz
