@@ -38,5 +38,5 @@ chmod +x /home/cs2/OSWorkShopFix-main/workshopfix.pl
 
 CRON
 
-* * * * * /home/cs2/OSWorkShopFix-main/workshopfix.sh >>/home/cs2/OSWorkShopFix-main/workshopfix.log 2>&1
+"* * * * * /home/cs2/OSWorkShopFix-main/workshopfix.sh >>/home/cs2/OSWorkShopFix-main/workshopfix.log 2>&1"
 
