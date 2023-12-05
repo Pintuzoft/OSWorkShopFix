@@ -45,7 +45,7 @@ https://linuxgsm.com/servers/cs2server/
   also means that if you need to restart the script you just have to kill the process
   and it will restart it within a minute.
   
-  "* * * * * /home/cs2/OSWorkShopFix-main/workshopfix.sh >>/home/cs2/OSWorkShopFix-main/workshopfix.log 2>&1"
+  "* * * * * /home/cs2/OSWorkShopFix-main/workshopfix.pl >>/home/cs2/OSWorkShopFix-main/workshopfix.log 2>&1"
   
 
 ## ===[ Information ]=========
