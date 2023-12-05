@@ -1,10 +1,9 @@
 # OSWorkShopFix
 
-Simple perl script to automate workshop maps for CS2
+Simple perl script to automate WorkShop Maps for CS2 servers.
 
-Use with Linux Game Server Manager (LGSM) found here:
-
-https://linuxgsm.com/servers/cs2server/
+This is a server script that parses the console log to identify when a match has ended
+and then it will pick a new map at random and change to it.
 
 
 ## ===[ Install ]=========
@@ -15,7 +14,11 @@ https://linuxgsm.com/servers/cs2server/
   
   ### LGSM
 
-  Run the LGSM as its own user, I tend to use cs2 user so the script is by default
+  Use with Linux Game Server Manager (LGSM) found here:
+
+  https://linuxgsm.com/servers/cs2server/
+
+  Run the LGSM under its own user, I tend to name the user cs2 so the script is by default
   having '/home/cs2' as its base directory, and where it has the cs2server command.
     
   ### PERL
