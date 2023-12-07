@@ -6,7 +6,7 @@ This is a server script that parses the console log to identify when a match has
 and then it will pick a new map at random and change to it.
 
 Please note that Im still testing this script out and have been sorting some bugs, so it
-might not be working 100% but 
+might not be working 100% but this current version seem to work fine as far as I can see
 
 
 ## ===[ Install ]=========
