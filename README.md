@@ -59,7 +59,7 @@ might not be working 100% but this current version seem to work fine as far as I
   this script was made to automate the use of workshop maps on a CS2 server. Basically
   in CSGO we could do this by setting some launch options, and it would play through
   the list of maps it had in a collection automatically. In CS2 this however has not 
-  yet been enabled the same way, so as far as I know while writting this readme file
+  yet been enabled the same way, so as far as I know while writing this readme file
   a CS2 server can only run 1 workshop map at a time by default, even if you add a 
   collection you cant make it automatically choose another map without interfering
   with the server.
