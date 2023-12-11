@@ -6,13 +6,18 @@ use Fcntl qw( :flock );
 
 $| = 1;  # Autoflush output
 
+# Debug
+my $debug = 0;
+
 # Define the lock file to prevent multiple instances
 my $lockfile = '/tmp/workshopfix.lock';
 
 # Try to open and lock the file
 open my $fhl, '>', $lockfile or die "Cannot open $lockfile: $!";
 unless ( flock $fhl, LOCK_EX | LOCK_NB ) {
-    print "Another instance is running. Exiting.\n";
+    if ($debug) {
+        printdt ("Another instance is running. Exiting.\n");
+    }
     exit 1;
 }
 
@@ -34,12 +39,30 @@ open my $fh, '<', $logpath or die "Cannot open $logpath: $!";
 $last_ino = (stat $fh)[1];
 seek $fh, 0, 2;
 
-print "0 - Initial setup done\n";
+
+# Subroutine to print messages with date and time
+sub printdt {
+    my ($message) = @_;
+
+    # Get the current date and time
+    my @now = localtime();
+    my $date_time = sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+        $now[5]+1900, $now[4]+1, $now[3], $now[2], $now[1], $now[0]);
+
+    # Print the message with the date and time
+    print "[$date_time]: $message\n";
+}
+
+if ($debug) {
+    printdt ("0 - Initial setup done");
+}
 
 # Triggers the command to list maps on the server
 sub trigger_map_list {
     system($basedir."/cs2server send \"ds_workshop_listmaps;EOF\"");
-    print "1 - Triggered maplist\n";
+    if ($debug) {
+        printdt ("1 - Triggered maplist");
+    }
     $collecting_maps = 1;
 }
 
@@ -47,21 +70,27 @@ sub trigger_map_list {
 sub parse_line {
     my ($line) = @_;
 
-    print "2 - Parsing line: $line\n";
+    if ($debug) {
+        printdt ("2 - Parsing line: $line");
+    }
 
     # Collecting maps logic
     if ($collecting_maps) {
         if ($line =~ /Unknown command 'EOF'!/) {
             # End of map list collection
             $collecting_maps = 0;
-            print "3 - Finished collecting maps\n";
-            print "4 - Maps: ".join(',', @maps)."\n";
+            @maps = map { s/^\s+|\s+$//g; $_ } @maps;
+            my $maps_string = "3 - Finished loading maps: " . join(', ', @maps);
+            printdt($maps_string);
             $game_over_processed = 0;
-        } elsif ($line !~ /^ds_workshop_listmaps;EOF$/) {
+
+        } elsif ($line !~ /ds_workshop_listmaps;EOF/) {
             # Add map to list
             chomp $line;
             push @maps, $line;
-            print "5 - Added map: $line\n";
+            if ($debug) {
+                printdt ("4 - Added map: $line");
+            }
         }
         return;
     }
@@ -75,18 +104,18 @@ sub parse_line {
         if ($nextmap) {
             # Announce and change to the next map
             system($basedir."/cs2server send \"say Nextmap: $nextmap\"");
-            print "6 - Announced nextmap\n";
+            printdt ("5 - Announced nextmap: $nextmap");
             close $fh;
             sleep 10;
             system($basedir."/cs2server send \"ds_workshop_changelevel $nextmap\"");
-            print "7 - Changed level to map: $nextmap\n";
+            printdt ("6 - Changed level to map: $nextmap");
             sleep 5;
             open $fh, '<', $logpath or die "Cannot open $logpath: $!";
             seek $fh, 0, 2;
             $last_ino = (stat $fh)[1];
             $game_over_processed = 0;
         } else {
-            print "8 - Error: Nextmap not selected. Maps might be empty.\n";
+            printdt ("7 - Error: Nextmap not selected. Maps might be empty.");
         }
     }
 }
@@ -111,6 +140,7 @@ while (1) {
 
     # Read and process lines from the log
     while (my $line = <$fh>) {
+        chomp $line;
         parse_line($line);
     }
 
@@ -124,6 +154,7 @@ close $fh;
 close $fhl;
 unlink $lockfile;
 
-print "10 - Exiting\n";
-
+if ($debug) {
+    printdt ("8 - Exiting");
+}
 exit 0;
