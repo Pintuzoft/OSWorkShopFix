@@ -57,9 +57,24 @@ if ($debug) {
     printdt ("0 - Initial setup done");
 }
 
+# Game server is running
+sub is_running {
+    # Process name
+    my $process_name = "cs2server";
+    
+    # Execute the command and capture its output
+    my $process_count = `ps aux | grep $process_name | grep -v grep | wc -l`;
+    chomp($process_count);  # Remove the trailing newline character
+    
+    # Convert count to an integer
+    $process_count += 0;
+    
+    return $process_count;
+}
+
 # Triggers the command to list maps on the server
 sub trigger_map_list {
-    system($basedir."/cs2server send \"ds_workshop_listmaps;EOF\"");
+    system("timeout 3 ".$basedir."/cs2server send \"ds_workshop_listmaps;EOF\"");
     if ($debug) {
         printdt ("1 - Triggered maplist");
     }
@@ -103,11 +118,11 @@ sub parse_line {
 
         if ($nextmap) {
             # Announce and change to the next map
-            system($basedir."/cs2server send \"say Nextmap: $nextmap\"");
+            system("timeout 3 ".$basedir."/cs2server send \"say Nextmap: $nextmap\"");
             printdt ("5 - Announced nextmap: $nextmap");
             close $fh;
             sleep 10;
-            system($basedir."/cs2server send \"ds_workshop_changelevel $nextmap\"");
+            system("timeout 3 ".$basedir."/cs2server send \"ds_workshop_changelevel $nextmap\"");
             printdt ("6 - Changed level to map: $nextmap");
             sleep 5;
             open $fh, '<', $logpath or die "Cannot open $logpath: $!";
@@ -122,30 +137,47 @@ sub parse_line {
 
 # Tick counter for fetching maps periodically
 my $tick = 999999;
-
+my $process_check = 99999;
+my $isRunning = 1;
 # Main loop
 while (1) {
+    
+    # Check the process every 5 min
+    if ($process_check > 10) {
+    	$isRunning = is_running();
+    	$process_check = 0;
+    	
+    	# Sleep for 1 min if process is not running
+    	if ( $isRunning < 1 ) {
+    	    sleep 60;
+    	    $process_check = 99999;
+    	}
+    }
+    
     # Check for log file rotation
     if ((stat $logpath)[1] != $last_ino) {
-        close $fh;
-        open $fh, '<', $logpath or die "Cannot reopen $logpath: $!";
-        $last_ino = (stat $fh)[1];
+	close $fh;
+	open $fh, '<', $logpath or die "Cannot reopen $logpath: $!";
+	$last_ino = (stat $fh)[1];
     }
-
+    
     # Trigger map list update periodically
     if ($tick > $fetch_maps_time) {
-        trigger_map_list();
-        $tick = 0;
+	trigger_map_list();
+	$tick = 0;
     }
-
+    
     # Read and process lines from the log
     while (my $line = <$fh>) {
-        chomp $line;
-        parse_line($line);
+	chomp $line;
+	parse_line($line);
     }
-
+    
+	
     # Sleep and increment tick counter
     $tick++;
+    $process_check++;
+#    printdt ("Tick: $tick, process_check: $process_check");
     sleep $sleep_time;
 }
 
