@@ -143,7 +143,7 @@ my $isRunning = 1;
 while (1) {
     
     # Check the process every 5 min
-    if ($process_check > 10) {
+    if ($process_check > 300) {
     	$isRunning = is_running();
     	$process_check = 0;
     	
