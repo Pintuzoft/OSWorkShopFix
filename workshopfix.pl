@@ -28,7 +28,7 @@ my $basedir = "/home/cs2";
 my $logpath = $basedir."/log/console/cs2server-console.log";
 my $last_ino = 0;               # Last inode number to detect log rotation
 my $sleep_time = 1;             # Sleep time in seconds between checks
-my $fetch_maps_time = 3600;     # Interval to fetch map list (every hour)
+my $fetch_maps_time = 1800;     # Interval to fetch map list (every half hour)
 
 my @maps;                       # Array to store available maps
 my $collecting_maps = 0;        # Flag to track if currently collecting maps
@@ -74,6 +74,7 @@ sub is_running {
 
 # Triggers the command to list maps on the server
 sub trigger_map_list {
+    @maps = ();  # Clear the map array before fetching new maps
     system("timeout 3 ".$basedir."/cs2server send \"ds_workshop_listmaps;EOF\"");
     if ($debug) {
         printdt ("1 - Triggered maplist");
@@ -99,9 +100,9 @@ sub parse_line {
             printdt($maps_string);
             $game_over_processed = 0;
 
-        } elsif ($line !~ /ds_workshop_listmaps;EOF/) {
-            # Add map to list
+        } elsif ($line =~ /^(de_|cs_|mp_|dz_|ar_|gd_|coop_|gs_)\w+\r$/) {  # Regex to match map names
             chomp $line;
+	    $line =~ s/\r$//;  # Remove the carriage return if present
             push @maps, $line;
             if ($debug) {
                 printdt ("4 - Added map: $line");
@@ -144,14 +145,14 @@ while (1) {
     
     # Check the process every 5 min
     if ($process_check > 300) {
-    	$isRunning = is_running();
-    	$process_check = 0;
-    	
-    	# Sleep for 1 min if process is not running
-    	if ( $isRunning < 1 ) {
-    	    sleep 60;
-    	    $process_check = 99999;
-    	}
+	$isRunning = is_running();
+	$process_check = 0;
+	
+	# Sleep for 1 min if process is not running
+	if ( $isRunning < 1 ) {
+	    sleep 60;
+	    $process_check = 99999;
+	}
     }
     
     # Check for log file rotation
