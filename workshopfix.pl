@@ -87,15 +87,17 @@ sub trigger_map_list {
 # Add a map to maps_recent
 sub add_recent_map {
     my ($map) = @_;
-    
-    # Add current map to @maps_recent unless already there
-    push @maps_recent, $map unless grep { $_ eq $map } @maps_recent;
-    printdt("Added map: $map to recently played maps list");
-    
-    # Check if the number of recent maps exceeds the limit
-    if (scalar @maps_recent > $max_recent_maps) {
-	my $oldest_map = shift @maps_recent; # Remove the oldest map
-	printdt("Removed oldest map: $oldest_map from recently played maps list");
+
+    # Add the map to @maps_recent unless it's already there
+    unless (grep { $_ eq $map } @maps_recent) {
+        push @maps_recent, $map;
+        printdt("Added map: $map to recently played maps list");
+
+        # Check if the number of recent maps exceeds the limit
+        if (scalar @maps_recent > $max_recent_maps) {
+            my $oldest_map = shift @maps_recent; # Remove the oldest map
+            printdt("Removed oldest map: $oldest_map from recently played maps list");
+        }
     }
 }
 
